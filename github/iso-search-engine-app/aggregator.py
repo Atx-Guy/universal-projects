@@ -3,8 +3,11 @@
 import logging
 import concurrent.futures
 
-# Import scraper functions
-from scrapers import official_linux, official_windows, distrowatch, linuxtracker
+# Import scraper functions - use absolute imports to local files
+import official_linux
+import official_windows
+import distrowatch
+import linuxtracker
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
