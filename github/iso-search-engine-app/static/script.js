@@ -36,7 +36,11 @@ document.addEventListener("DOMContentLoaded", () => {
         ],
         "windows": [
             { value: "11", label: "Windows 11" },
-            { value: "10", label: "Windows 10" }
+            { value: "10", label: "Windows 10" },
+            { value: "8.1", label: "Windows 8.1" },
+            { value: "8", label: "Windows 8" },
+            { value: "7", label: "Windows 7" },
+            { value: "vista", label: "Windows Vista" }
         ]
     };
 
