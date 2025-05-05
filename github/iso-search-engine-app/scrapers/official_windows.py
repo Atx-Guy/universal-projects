@@ -164,48 +164,49 @@ def scrape_windows(query, version=None, architecture=None):
     query_lower = query.lower()
     iso_patterns = [".iso"]
     found_links = []
-    processed_urls = set()
 
-    urls_to_scrape = []
+    # Microsoft official download links only exist for Windows 10 and 11
+    # For older versions, we'll go straight to Internet Archive
     target_url = None
-    if "windows 10" in query_lower or (query_lower == "windows" and version == "10"):
-        target_url = "https://www.microsoft.com/en-us/software-download/windows10ISO"
-        urls_to_scrape.append(target_url)
-        urls_to_scrape.append("https://www.microsoft.com/software-download/windows10")
-    elif "windows 11" in query_lower or (query_lower == "windows" and version == "11"):
+    if version == "11" or "windows 11" in query_lower:
         target_url = "https://www.microsoft.com/en-us/software-download/windows11"
-        urls_to_scrape.append(target_url)
-    else:
-        logging.warning(f"Unsupported Windows query: {query}. Only \"Windows 10\" or \"Windows 11\" supported.")
-        return []
-
-    # First try Microsoft's official site
-    for url in urls_to_scrape:
-        if url in processed_urls:
-            continue
-        response = safe_request(url)
-        if response:
-            processed_urls.add(url)
-            soup = BeautifulSoup(response.text, "html.parser")
-
-            page_links = find_links(soup, url, iso_patterns)
-            found_links.extend(page_links)
-            logging.info(f"Found {len(page_links)} potential direct ISO links on {url}")
-
-            logging.warning(f"Scraping {url} with basic methods. May not find all links due to JavaScript dependency.")
-
-    # Now search Internet Archive
-    # Determine which Windows version to search for
-    windows_version = None
-    if "windows 10" in query_lower or (version == "10"):
-        windows_version = "10"
-    elif "windows 11" in query_lower or (version == "11"):
-        windows_version = "11"
-    else:
-        windows_version = version  # Use provided version or None
         
-    archive_links = scrape_internet_archive("Windows", windows_version, architecture)
-    # Give these links lower priority than official links by appending them
+        # Try Microsoft's official site for Windows 11
+        response = safe_request(target_url)
+        if response:
+            soup = BeautifulSoup(response.text, "html.parser")
+            page_links = find_links(soup, target_url, iso_patterns)
+            found_links.extend(page_links)
+            logging.info(f"Found {len(page_links)} potential direct ISO links on {target_url}")
+            
+            # Even if no direct links found, keep the official tool URL
+            if not page_links:
+                found_links.append({
+                    "link": target_url,
+                    "source": "Official (Page Link - Use Media Tool or follow instructions)"
+                })
+                
+    elif version == "10" or "windows 10" in query_lower:
+        target_url = "https://www.microsoft.com/en-us/software-download/windows10ISO"
+        
+        # Try Microsoft's official site for Windows 10
+        response = safe_request(target_url)
+        if response:
+            soup = BeautifulSoup(response.text, "html.parser")
+            page_links = find_links(soup, target_url, iso_patterns)
+            found_links.extend(page_links)
+            logging.info(f"Found {len(page_links)} potential direct ISO links on {target_url}")
+            
+            # Even if no direct links found, keep the official tool URL
+            if not page_links:
+                found_links.append({
+                    "link": target_url,
+                    "source": "Official (Page Link - Use Media Tool or follow instructions)"
+                })
+    
+    # For all Windows versions (including 10 and 11), search Internet Archive
+    # This will be the only source for Windows 7, 8, 8.1, and Vista
+    archive_links = scrape_internet_archive("Windows", version, architecture)
     found_links.extend(archive_links)
     
     # Combine and deduplicate results
@@ -214,17 +215,9 @@ def scrape_windows(query, version=None, architecture=None):
         unique_links_map[link_info["link"]] = link_info
 
     unique_links = list(unique_links_map.values())
-    logging.info(f"Found {len(unique_links)} total unique Windows links")
-
-    # If no direct links but we have a target URL, return that
-    if not unique_links and target_url:
-        logging.warning("No direct ISO links found from official sources. Microsoft primarily offers the Media Creation Tool.")
-        found_links.append({
-            "link": target_url,
-            "source": "Official (Page Link - Use Media Tool or follow instructions)"
-        })
-        
-    return found_links
+    logging.info(f"Found {len(unique_links)} total unique Windows links for version {version}")
+    
+    return unique_links
 
 # Example usage (for testing)
 if __name__ == "__main__":
