@@ -2,5 +2,6 @@ flask==2.2.3
 werkzeug==2.2.3
 requests==2.28.2
 beautifulsoup4==4.11.2
+selenium==4.17.2
 aggregator
 scrapers
