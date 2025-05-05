@@ -27,9 +27,9 @@ def run_scraper(scraper_func, query_tuple):
         logging.error(f"Error running scraper {scraper_func.__name__} for query \"{query_tuple}\": {e}", exc_info=True)
         return []
 
-def search_isos(query, version, architecture):
+def search_isos(query, version):
     """Aggregates search results from all relevant scrapers."""
-    logging.info(f"Aggregating search results for query: {query}, version: {version}, architecture: {architecture}")
+    logging.info(f"Aggregating search results for query: {query}, version: {version}")
     query_lower = query.lower()
     all_links = []
 
@@ -48,18 +48,18 @@ def search_isos(query, version, architecture):
     for distro in linux_distros:
         if distro in query_lower:
             matched_distro = distro
-            # Pass distro name, search query (with version), version, and architecture to official_linux.scrape
-            scrapers_to_run.append((official_linux.scrape, (distro, search_query, version, architecture)))
-            # Pass search query (with version), version, and architecture to other scrapers
-            scrapers_to_run.append((distrowatch.scrape_distrowatch, (search_query, version, architecture)))
-            scrapers_to_run.append((linuxtracker.scrape_linuxtracker, (search_query, version, architecture)))
+            # Pass distro name, search query (with version), and version to official_linux.scrape
+            scrapers_to_run.append((official_linux.scrape, (distro, search_query, version)))
+            # Pass search query (with version) and version to other scrapers
+            scrapers_to_run.append((distrowatch.scrape_distrowatch, (search_query, version)))
+            scrapers_to_run.append((linuxtracker.scrape_linuxtracker, (search_query, version)))
             break # Assume only one distro per query for now
 
     # Windows
     if "windows" in query_lower:
-        scrapers_to_run.append((official_windows.scrape_windows, (search_query, version, architecture)))
+        scrapers_to_run.append((official_windows.scrape_windows, (search_query, version)))
         # Optionally add torrent sites for Windows if desired
-        # scrapers_to_run.append((linuxtracker.scrape_linuxtracker, (search_query, version, architecture)))
+        # scrapers_to_run.append((linuxtracker.scrape_linuxtracker, (search_query, version)))
 
     if not scrapers_to_run:
         logging.warning(f"No relevant scrapers identified for query: {query}")
@@ -91,11 +91,6 @@ def search_isos(query, version, architecture):
             if version and not link_matches_version(link_url, version):
                 continue
                 
-            # Filter by architecture if it's included in the link info
-            link_arch = link_info.get("architecture", "").lower()
-            if link_arch and architecture.lower() not in link_arch:
-                continue
-                
             # If link already exists, keep the one with higher priority (lower number)
             existing_priority = SOURCE_PRIORITY.get(unique_links_map.get(link_url, {}).get("source"), DEFAULT_PRIORITY)
             current_priority = SOURCE_PRIORITY.get(link_info.get("source"), DEFAULT_PRIORITY)
@@ -108,7 +103,7 @@ def search_isos(query, version, architecture):
         key=lambda x: (SOURCE_PRIORITY.get(x.get("source"), DEFAULT_PRIORITY), x.get("link"))
     )
 
-    logging.info(f"Aggregated {len(sorted_links)} unique links for query \"{query}\" with version \"{version}\" and architecture \"{architecture}\"")
+    logging.info(f"Aggregated {len(sorted_links)} unique links for query \"{query}\" with version \"{version}\"")
     return sorted_links
 
 def link_matches_version(link, version):
@@ -132,25 +127,22 @@ def link_matches_version(link, version):
 if __name__ == "__main__":
     test_query_ubuntu = "Ubuntu"
     test_version_ubuntu = "24.04"
-    test_architecture_ubuntu = "x86_64"
-    print(f"\n--- Aggregated Results for: {test_query_ubuntu}, Version: {test_version_ubuntu}, Architecture: {test_architecture_ubuntu} ---")
-    results_ubuntu = search_isos(test_query_ubuntu, test_version_ubuntu, test_architecture_ubuntu)
+    print(f"\n--- Aggregated Results for: {test_query_ubuntu}, Version: {test_version_ubuntu} ---")
+    results_ubuntu = search_isos(test_query_ubuntu, test_version_ubuntu)
     for link in results_ubuntu:
         print(f"[{link['source']}] {link['link']}") # Use standard quotes
 
     test_query_windows = "Windows"
     test_version_windows = "11"
-    test_architecture_windows = "x86_64"
-    print(f"\n--- Aggregated Results for: {test_query_windows}, Version: {test_version_windows}, Architecture: {test_architecture_windows} ---")
-    results_windows = search_isos(test_query_windows, test_version_windows, test_architecture_windows)
+    print(f"\n--- Aggregated Results for: {test_query_windows}, Version: {test_version_windows} ---")
+    results_windows = search_isos(test_query_windows, test_version_windows)
     for link in results_windows:
         print(f"[{link['source']}] {link['link']}") # Use standard quotes
 
     test_query_debian = "Debian"
     test_version_debian = "12"
-    test_architecture_debian = "arm64"
-    print(f"\n--- Aggregated Results for: {test_query_debian}, Version: {test_version_debian}, Architecture: {test_architecture_debian} ---")
-    results_debian = search_isos(test_query_debian, test_version_debian, test_architecture_debian)
+    print(f"\n--- Aggregated Results for: {test_query_debian}, Version: {test_version_debian} ---")
+    results_debian = search_isos(test_query_debian, test_version_debian)
     for link in results_debian:
         print(f"[{link['source']}] {link['link']}") # Use standard quotes
 
