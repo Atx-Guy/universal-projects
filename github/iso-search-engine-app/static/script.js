@@ -3,12 +3,14 @@
 document.addEventListener("DOMContentLoaded", () => {
     const searchForm = document.getElementById("search-form");
     const searchQueryInput = document.getElementById("search-query");
+    const architectureFilter = document.getElementById("architecture-filter");
     const resultsList = document.getElementById("results-list");
     const loadingIndicator = document.getElementById("loading-indicator");
 
     searchForm.addEventListener("submit", async (event) => {
         event.preventDefault(); // Prevent default form submission
         const query = searchQueryInput.value.trim();
+        const architecture = architectureFilter.value;
 
         if (!query) {
             return; // Don't search if query is empty
@@ -19,8 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
         loadingIndicator.style.display = "block";
 
         try {
-            // Make API call to the backend
-            const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+            // Make API call to the backend with both query and architecture filter
+            const response = await fetch(`/search?q=${encodeURIComponent(query)}&arch=${encodeURIComponent(architecture)}`);
             
             if (!response.ok) {
                 // Handle HTTP errors
