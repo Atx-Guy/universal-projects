@@ -1,0 +1,37 @@
+# Git files
+.git
+.gitignore
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Python cache and virtual environment
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv
+venv/
+env/
+
+# Temporary files created by the app
+temp/
+
+# Testing files
+tests/
+.pytest_cache/
+coverage.xml
+.coverage
+
+# IDE/Editor files
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Local database files (if any)
+*.db
+*.sqlite3

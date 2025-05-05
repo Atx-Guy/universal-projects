@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block title %}PDF to Images{% endblock %}
+
+{% from "components/feature_notice.html" import feature_notice %}
+{% if not features.pdf.advanced %}
+  {{ feature_notice("PDF", ["reportlab==3.6.12", "PyMuPDF==1.21.1"]) }}
+{% endif %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="mb-3">PDF to Images</h1>
+                <p class="lead text-muted">Convert each page of your PDF into high-quality images</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body p-4">
+                    <form id="pdfToImageForm" action="{{ url_for('pdf.pdf_to_images') }}" method="post" enctype="multipart/form-data" data-ajax-form>
+                        <!-- File Upload Section -->
+                        <div class="upload-section mb-4">
+                            <div id="dropZone" class="drop-zone">
+                                <div class="drop-message">
+                                    <img src="/static/img/icons/pdf.svg" alt="PDF" width="48" class="mb-3">
+                                    <p>Drag and drop your PDF file here</p>
+                                    <span class="drop-subtitle">or</span>
+                                </div>
+                                
+                                <input type="file" id="fileInput" name="file" class="d-none" accept=".pdf">
+                                <button type="button" class="btn btn-primary btn-upload" onclick="document.getElementById('fileInput').click()">
+                                    Choose PDF File
+                                </button>
+                            </div>
+                            
+                            <div id="fileInfo" class="file-info d-none">
+                                <div class="file-details">
+                                    <div class="d-flex align-items-center">
+                                        <div class="pdf-icon me-3">
+                                            <i class="bi bi-file-earmark-pdf fs-2 text-danger"></i>
+                                        </div>
+                                        <div>
+                                            <p class="file-name mb-0">File: <span id="fileName"></span></p>
+                                            <p class="file-size mb-0">Size: <span id="fileSize"></span></p>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger ms-auto" id="removeFileBtn">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Conversion Options Section -->
+                        <div id="conversionOptions" class="d-none">
+                            <h5 class="mb-3">Conversion Options</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="outputFormat" class="form-label">Image Format</label>
+                                    <select id="outputFormat" name="format" class="form-select" required>
+                                        <option value="png" selected>PNG</option>
+                                        <option value="jpg">JPG</option>
+                                        <option value="tiff">TIFF</option>
+                                        <option value="bmp">BMP</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="dpi" class="form-label">Resolution (DPI)</label>
+                                    <select id="dpi" name="dpi" class="form-select">
+                                        <option value="72">72 DPI (Screen)</option>
+                                        <option value="150">150 DPI (Medium)</option>
+                                        <option value="200" selected>200 DPI (Standard)</option>
+                                        <option value="300">300 DPI (High)</option>
+                                        <option value="600">600 DPI (Print)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg" id="convertBtn">
+                                    <i class="bi bi-file-earmark-image me-2"></i> Convert to Images
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- How it Works -->
+            <div class="card mt-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">How it Works</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="bi bi-upload fs-2"></i>
+                                </div>
+                                <h6>1. Upload PDF</h6>
+                                <p class="text-muted small">Upload your PDF file using drag & drop or file selection</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="bi bi-gear fs-2"></i>
+                                </div>
+                                <h6>2. Choose Settings</h6>
+                                <p class="text-muted small">Select your preferred image format and resolution</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="bi bi-download fs-2"></i>
+                                </div>
+                                <h6>3. Download Images</h6>
+                                <p class="text-muted small">Get your converted images in a ZIP file</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Features -->
+            <div class="card mt-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">Features</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="feature-icon me-3">
+                                    <i class="bi bi-shield-check text-success"></i>
+                                </div>
+                                <div>
+                                    <h6>High Quality Conversion</h6>
+                                    <p class="text-muted small mb-0">Get crisp, clear images with adjustable DPI settings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="feature-icon me-3">
+                                    <i class="bi bi-image text-primary"></i>
+                                </div>
+                                <div>
+                                    <h6>Multiple Formats</h6>
+                                    <p class="text-muted small mb-0">Convert to PNG, JPG, TIFF, or BMP</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="feature-icon me-3">
+                                    <i class="bi bi-lightning text-warning"></i>
+                                </div>
+                                <div>
+                                    <h6>Fast Processing</h6>
+                                    <p class="text-muted small mb-0">Quick conversion of multiple pages</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <div class="feature-icon me-3">
+                                    <i class="bi bi-lock text-info"></i>
+                                </div>
+                                <div>
+                                    <h6>Secure Conversion</h6>
+                                    <p class="text-muted small mb-0">Files are processed securely and deleted after conversion</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Modal -->
+<div class="modal fade" id="progressModal" data-bs-backdrop="static" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="spinner-border text-primary mb-3" role="status"></div>
+                <h5>Converting PDF to Images</h5>
+                <p class="text-muted mb-0">Please wait while we process your file...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('pdfToImageForm');
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+    const conversionOptions = document.getElementById('conversionOptions');
+    const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
+    
+    // Drag and drop handling
+    dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+    
+    dropZone.addEventListener('dragleave', function() {
+        dropZone.classList.remove('drag-over');
+    });
+    
+    dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelect(files[0]);
+        }
+    });
+    
+    // File input change
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            handleFileSelect(this.files[0]);
+        }
+    });
+    
+    // Remove file button
+    removeFileBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        fileInfo.classList.add('d-none');
+        dropZone.classList.remove('d-none');
+        conversionOptions.classList.add('d-none');
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function() {
+        progressModal.show();
+    });
+    
+    // File selection handler
+    function handleFileSelect(file) {
+        if (file.type !== 'application/pdf') {
+            showAlert('Please select a PDF file.', 'error');
+            return;
+        }
+        
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        
+        dropZone.classList.add('d-none');
+        fileInfo.classList.remove('d-none');
+        conversionOptions.classList.remove('d-none');
+        
+        // Set the file in the file input
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+    }
+    
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Show alert message
+    function showAlert(message, type) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show`;
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        form.insertBefore(alertDiv, form.firstChild);
+    }
+});
+</script>
+{% endblock %}
