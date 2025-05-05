@@ -12,6 +12,44 @@
         <form id="search-form">
             <div class="search-controls">
                 <input type="text" id="search-query" placeholder="Enter OS name (e.g., Ubuntu 24.04, Windows 11)" required>
+                
+                <select id="version-filter">
+                    <option value="" selected>All Versions</option>
+                    <!-- Ubuntu versions -->
+                    <optgroup label="Ubuntu">
+                        <option value="24.04">Ubuntu 24.04 LTS</option>
+                        <option value="23.10">Ubuntu 23.10</option>
+                        <option value="22.04">Ubuntu 22.04 LTS</option>
+                        <option value="20.04">Ubuntu 20.04 LTS</option>
+                        <option value="18.04">Ubuntu 18.04 LTS</option>
+                    </optgroup>
+                    <!-- Fedora versions -->
+                    <optgroup label="Fedora">
+                        <option value="40">Fedora 40</option>
+                        <option value="39">Fedora 39</option>
+                        <option value="38">Fedora 38</option>
+                        <option value="37">Fedora 37</option>
+                    </optgroup>
+                    <!-- Debian versions -->
+                    <optgroup label="Debian">
+                        <option value="12">Debian 12 (Bookworm)</option>
+                        <option value="11">Debian 11 (Bullseye)</option>
+                        <option value="10">Debian 10 (Buster)</option>
+                    </optgroup>
+                    <!-- Linux Mint versions -->
+                    <optgroup label="Linux Mint">
+                        <option value="21.3">Linux Mint 21.3</option>
+                        <option value="21.2">Linux Mint 21.2</option>
+                        <option value="21.1">Linux Mint 21.1</option>
+                        <option value="20.3">Linux Mint 20.3</option>
+                    </optgroup>
+                    <!-- Windows versions -->
+                    <optgroup label="Windows">
+                        <option value="11">Windows 11</option>
+                        <option value="10">Windows 10</option>
+                    </optgroup>
+                </select>
+                
                 <select id="architecture-filter" required>
                     <option value="" disabled selected>Select Architecture</option>
                     <option value="x86_64">x86_64 (64-bit)</option>
