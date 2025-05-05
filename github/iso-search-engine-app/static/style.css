@@ -39,7 +39,8 @@ h1 {
     border-radius: 4px;
 }
 
-#architecture-filter {
+#architecture-filter,
+#version-filter {
     flex: 0 1 150px;
     padding: 10px;
     border: 1px solid #ccc;
