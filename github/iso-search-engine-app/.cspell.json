@@ -1,0 +1,22 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "distrowatch",
+    "linuxtracker",
+    "levelname",
+    "Linuxtracker",
+    "isos",
+    "distros",
+    "Distros"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "venv",
+    "myenv",
+    ".git/objects",
+    ".vscode",
+    "package-lock.json",
+    "__pycache__"
+  ]
+}
