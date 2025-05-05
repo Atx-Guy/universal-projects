@@ -1,22 +1,22 @@
 // /home/ubuntu/iso_search_engine/static/script.js
 
-document.addEventListener(\"DOMContentLoaded\", () => {
-    const searchForm = document.getElementById(\"search-form\");
-    const searchQueryInput = document.getElementById(\"search-query\");
-    const resultsList = document.getElementById(\"results-list\");
-    const loadingIndicator = document.getElementById(\"loading-indicator\");
+document.addEventListener("DOMContentLoaded", () => {
+    const searchForm = document.getElementById("search-form");
+    const searchQueryInput = document.getElementById("search-query");
+    const resultsList = document.getElementById("results-list");
+    const loadingIndicator = document.getElementById("loading-indicator");
 
-    searchForm.addEventListener(\"submit\", async (event) => {
+    searchForm.addEventListener("submit", async (event) => {
         event.preventDefault(); // Prevent default form submission
         const query = searchQueryInput.value.trim();
 
         if (!query) {
-            return; // Don\t search if query is empty
+            return; // Don't search if query is empty
         }
 
         // Clear previous results and show loading indicator
-        resultsList.innerHTML = \"\";
-        loadingIndicator.style.display = \"block\";
+        resultsList.innerHTML = "";
+        loadingIndicator.style.display = "block";
 
         try {
             // Make API call to the backend
@@ -35,26 +35,26 @@ document.addEventListener(\"DOMContentLoaded\", () => {
             const results = await response.json();
 
             // Hide loading indicator
-            loadingIndicator.style.display = \"none\";
+            loadingIndicator.style.display = "none";
 
             // Display results
             if (results && results.length > 0) {
                 results.forEach(item => {
-                    const listItem = document.createElement(\"li\");
+                    const listItem = document.createElement("li");
                     
                     // Create source span
-                    const sourceSpan = document.createElement(\"span\");
+                    const sourceSpan = document.createElement("span");
                     sourceSpan.textContent = item.source;
                     // Create a CSS-friendly class name from the source string
-                    const sourceClass = item.source.replace(/[^a-zA-Z0-9]/g, \"-\"); 
+                    const sourceClass = item.source.replace(/[^a-zA-Z0-9]/g, "-"); 
                     sourceSpan.className = `source source-${sourceClass}`;
                     
                     // Create link
-                    const link = document.createElement(\"a\");
+                    const link = document.createElement("a");
                     link.href = item.link;
                     link.textContent = item.link;
-                    link.target = \"_blank\"; // Open in new tab
-                    link.rel = \"noopener noreferrer\";
+                    link.target = "_blank"; // Open in new tab
+                    link.rel = "noopener noreferrer";
 
                     listItem.appendChild(sourceSpan);
                     listItem.appendChild(link);
@@ -62,19 +62,19 @@ document.addEventListener(\"DOMContentLoaded\", () => {
                 });
             } else {
                 // Display no results message
-                const noResultsItem = document.createElement(\"li\");
-                noResultsItem.textContent = \"No results found for your query.\";
+                const noResultsItem = document.createElement("li");
+                noResultsItem.textContent = "No results found for your query.";
                 resultsList.appendChild(noResultsItem);
             }
 
         } catch (error) {
             // Hide loading indicator and display error
-            loadingIndicator.style.display = \"none\";
-            const errorItem = document.createElement(\"li\");
+            loadingIndicator.style.display = "none";
+            const errorItem = document.createElement("li");
             errorItem.textContent = `Search failed: ${error.message}`;
-            errorItem.style.color = \"red\";
+            errorItem.style.color = "red";
             resultsList.appendChild(errorItem);
-            console.error(\"Search failed:\", error);
+            console.error("Search failed:", error);
         }
     });
 });
