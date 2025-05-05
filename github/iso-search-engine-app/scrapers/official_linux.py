@@ -269,18 +269,15 @@ def scrape_linux_mint(query):
 
 # --- Main function for this module ---
 
-def scrape(distro, query, architecture=None):
-    """Calls the appropriate scraper based on the distribution name and filters by architecture."""
+def scrape(distro, query, version=None, architecture=None):
+    """Calls the appropriate scraper based on the distribution name and filters by version and architecture."""
     distro_lower = distro.lower()
     
-    # Function wrapper to add architecture filtering
-    def scrape_with_architecture(scraper_func, query):
+    # Function wrapper to add version and architecture filtering
+    def scrape_with_filters(scraper_func, query):
         results = scraper_func(query)
-        if not architecture:
-            return results
-            
-        # Filter results by architecture
         filtered_results = []
+        
         for link_info in results:
             href_lower = link_info["link"].lower()
             
@@ -298,22 +295,45 @@ def scrape(distro, query, architecture=None):
                     link_info["architecture"] = "ppc64el"
                 elif "s390x" in href_lower:
                     link_info["architecture"] = "s390x"
-                    
-            # Include if architecture matches or not specified in link
-            if not link_info.get("architecture") or architecture.lower() in link_info.get("architecture", "").lower():
-                filtered_results.append(link_info)
+            
+            # Apply version filter if specified
+            if version:
+                version_match = False
+                version_variations = [
+                    version,
+                    version.replace(".", "-"),
+                    f"-{version}-",
+                    f"/{version}/",
+                    f"_{version}_",
+                    f"{version}_"
+                ]
                 
-        logging.info(f"Filtered {len(results)} links to {len(filtered_results)} matching architecture {architecture}")
+                if any(var in href_lower for var in version_variations):
+                    version_match = True
+                    # Add version info to link metadata
+                    link_info["version"] = version
+                
+                if not version_match:
+                    continue  # Skip if no version match
+            
+            # Apply architecture filter if specified
+            if architecture and link_info.get("architecture"):
+                if architecture.lower() not in link_info.get("architecture", "").lower():
+                    continue  # Skip if no architecture match
+                    
+            filtered_results.append(link_info)
+                
+        logging.info(f"Filtered {len(results)} links to {len(filtered_results)} matching filters: version={version}, architecture={architecture}")
         return filtered_results
     
     if distro_lower == "ubuntu":
-        return scrape_with_architecture(scrape_ubuntu, query)
+        return scrape_with_filters(scrape_ubuntu, query)
     elif distro_lower == "fedora":
-        return scrape_with_architecture(scrape_fedora, query)
+        return scrape_with_filters(scrape_fedora, query)
     elif distro_lower == "debian":
-        return scrape_with_architecture(scrape_debian, query)
+        return scrape_with_filters(scrape_debian, query)
     elif distro_lower == "linux mint" or distro_lower == "mint":
-        return scrape_with_architecture(scrape_linux_mint, query)
+        return scrape_with_filters(scrape_linux_mint, query)
     else:
         logging.warning(f"Unsupported Linux distribution: {distro}")
         return []
