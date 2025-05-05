@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchForm = document.getElementById("search-form");
     const distroFilter = document.getElementById("distro-filter");
     const versionFilter = document.getElementById("version-filter");
-    const architectureFilter = document.getElementById("architecture-filter");
     const resultsList = document.getElementById("results-list");
     const loadingIndicator = document.getElementById("loading-indicator");
 
@@ -71,9 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault(); // Prevent default form submission
         const distro = distroFilter.value;
         const version = versionFilter.value;
-        const architecture = architectureFilter.value;
 
-        if (!distro || !version || !architecture) {
+        if (!distro || !version) {
             return; // Don't search if any required field is empty
         }
 
@@ -85,8 +83,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // Create search query from selected options
             const query = distro;
             
-            // Make API call to the backend with all parameters
-            const response = await fetch(`/search?q=${encodeURIComponent(query)}&version=${encodeURIComponent(version)}&arch=${encodeURIComponent(architecture)}`);
+            // Make API call to the backend with distribution and version parameters
+            const response = await fetch(`/search?q=${encodeURIComponent(query)}&version=${encodeURIComponent(version)}`);
             
             if (!response.ok) {
                 // Handle HTTP errors
@@ -115,10 +113,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     const sourceClass = item.source.replace(/[^a-zA-Z0-9]/g, "-"); 
                     sourceSpan.className = `source source-${sourceClass}`;
                     
+                    // Display architecture if available
+                    let linkText = item.link;
+                    if (item.architecture) {
+                        linkText = `[${item.architecture}] ${item.link}`;
+                    }
+                    
                     // Create link
                     const link = document.createElement("a");
                     link.href = item.link;
-                    link.textContent = item.link;
+                    link.textContent = item.title || linkText;
                     link.target = "_blank"; // Open in new tab
                     link.rel = "noopener noreferrer";
 
