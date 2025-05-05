@@ -4,7 +4,7 @@ import logging
 import concurrent.futures
 
 # Import scraper functions from the scrapers package
-from scrapers import official_linux, official_windows, distrowatch, linuxtracker
+from scrapers import official_linux, official_windows, s, linuxtracker
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
