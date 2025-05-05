@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}PDF OCR{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="mb-3">PDF OCR</h1>
+                <p class="lead text-muted">Convert scanned PDFs into searchable text</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body p-4">
+                    <form id="ocrForm" action="{{ url_for('pdf.ocr_pdf') }}" method="post" enctype="multipart/form-data" data-ajax-form>
+                        <!-- File Upload Section -->
+                        <div class="mb-4">
+                            <label class="form-label fw-medium">1. Select PDF File</label>
+                            <div id="dropZone" class="drop-zone">
+                                <div class="drop-message">
+                                    <i class="bi bi-file-pdf fs-1 text-primary mb-2"></i>
+                                    <p>Drag and drop your PDF file here</p>
+                                    <span class="drop-subtitle">or</span>
+                                </div>
+                                
+                                <input type="file" id="fileInput" name="file" class="d-none" accept=".pdf">
+                                <button type="button" class="btn btn-primary btn-upload" onclick="document.getElementById('fileInput').click()">
+                                    Choose File
+                                </button>
+                            </div>
+                            
+                            <div id="fileInfo" class="mt-3 d-none">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-file-pdf fs-4 text-primary me-3"></i>
+                                            <div class="file-details flex-grow-1">
+                                                <h6 class="mb-1" id="fileName">filename.pdf</h6>
+                                                <small class="text-muted" id="fileSize">Size: 0 KB</small>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" id="removeFile">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- OCR Settings -->
+                        <div class="mb-4">
+                            <label class="form-label fw-medium">2. Configure OCR Settings</label>
+                            
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="output_format" class="form-label">Output Format</label>
+                                        <select class="form-select" id="output_format" name="output_format">
+                                            <option value="pdf" selected>
+                                                <i class="bi bi-file-pdf"></i> Searchable PDF
+                                            </option>
+                                            <option value="txt">
+                                                <i class="bi bi-file-text"></i> Text File
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="language" class="form-label">Document Language</label>
+                                        <select class="form-select" id="language" name="language">
+                                            <option value="eng" selected>English</option>
+                                            <option value="fra">French</option>
+                                            <option value="deu">German</option>
+                                            <option value="spa">Spanish</option>
+                                            <option value="ita">Italian</option>
+                                            <option value="por">Portuguese</option>
+                                            <option value="rus">Russian</option>
+                                            <option value="chi_sim">Chinese (Simplified)</option>
+                                            <option value="chi_tra">Chinese (Traditional)</option>
+                                            <option value="jpn">Japanese</option>
+                                            <option value="kor">Korean</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg" disabled id="submitBtn">
+                                <i class="bi bi-magic me-2"></i> Perform OCR
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- How it Works -->
+            <div class="card mt-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0">How it Works</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="bi bi-upload"></i>
+                                </div>
+                                <h6>1. Upload PDF</h6>
+                                <p class="small text-muted">Select your scanned PDF document</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="bi bi-magic"></i>
+                                </div>
+                                <h6>2. Configure OCR</h6>
+                                <p class="small text-muted">Choose format and language</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="feature-icon mb-3">
+                                    <i class="bi bi-download"></i>
+                                </div>
+                                <h6>3. Download</h6>
+                                <p class="small text-muted">Get your searchable document</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .drop-zone {
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .drop-zone:hover,
+    .drop-zone.dragover {
+        border-color: var(--primary-color);
+        background-color: rgba(79, 70, 229, 0.05);
+    }
+    
+    .drop-message {
+        margin-bottom: 1rem;
+    }
+    
+    .drop-subtitle {
+        display: block;
+        margin: 0.5rem 0;
+        color: var(--text-secondary);
+    }
+    
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: rgba(79, 70, 229, 0.1);
+        color: var(--primary-color);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    /* Dark theme adjustments */
+    .dark-theme .drop-zone:hover,
+    .dark-theme .drop-zone.dragover {
+        border-color: var(--dark-primary-color);
+        background-color: rgba(99, 102, 241, 0.1);
+    }
+    
+    .dark-theme .feature-icon {
+        background-color: rgba(99, 102, 241, 0.2);
+        color: var(--dark-primary-color);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFile = document.getElementById('removeFile');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // File upload handling
+    function handleFile(file) {
+        if (file && file.name.toLowerCase().endsWith('.pdf')) {
+            fileName.textContent = file.name;
+            fileSize.textContent = `Size: ${formatFileSize(file.size)}`;
+            fileInfo.classList.remove('d-none');
+            submitBtn.disabled = false;
+        } else {
+            alert('Please select a valid PDF file.');
+            fileInput.value = '';
+        }
+    }
+    
+    // File input change
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            handleFile(this.files[0]);
+        }
+    });
+    
+    // Drag and drop
+    dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', function() {
+        this.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+    
+    // Remove file
+    removeFile.addEventListener('click', function() {
+        fileInput.value = '';
+        fileInfo.classList.add('d-none');
+        submitBtn.disabled = true;
+    });
+    
+    // Helper function to format file size
+    function formatFileSize(bytes) {
+        const units = ['B', 'KB', 'MB', 'GB'];
+        let size = bytes;
+        let unitIndex = 0;
+        
+        while (size >= 1024 && unitIndex < units.length - 1) {
+            size /= 1024;
+            unitIndex++;
+        }
+        
+        return `${size.toFixed(2)} ${units[unitIndex]}`;
+    }
+});
+</script>
+{% endblock %}

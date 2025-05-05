@@ -3518,3 +3518,32 @@ Setting up watches.  Beware: since -r was given, this may take a while!
 Watches established.
 /home/ryan/projects/ MODIFY nohup.out
 Sun May  4 10:47:42 PM CDT 2025: Change detected in '/home/ryan/projects'. Staging changes...
+Sun May  4 10:47:42 PM CDT 2025: Committing staged changes...
+[main 123b207] Auto-sync: Files changed on 2025-05-04 22:47:16
+ 1 file changed, 17 insertions(+)
+Sun May  4 10:47:42 PM CDT 2025: Pushing changes to GitHub (origin/main)...
+To https://github.com/Atx-Guy/universal-projects.git
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'https://github.com/Atx-Guy/universal-projects.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+Sun May  4 10:47:43 PM CDT 2025: Error: git push failed. Remote likely has changes not present locally.
+Sun May  4 10:47:43 PM CDT 2025: Manual intervention (git pull/push) likely needed in '/home/ryan/projects'.
+Setting up watches.  Beware: since -r was given, this may take a while!
+Watches established.
+/home/ryan/projects/github/ryan-file-converter-app/ffmpeg-static/ MODIFY ffmpeg
+Sun May  4 10:47:45 PM CDT 2025: Change detected in '/home/ryan/projects'. Staging changes...
+fatal: Unable to create '/home/ryan/projects/.git/index.lock': File exists.
+
+Another git process seems to be running in this repository, e.g.
+an editor opened by 'git commit'. Please make sure all processes
+are terminated then try again. If it still fails, a git process
+may have crashed in this repository earlier:
+remove the file manually to continue.
+Sun May  4 10:47:45 PM CDT 2025: No actual changes staged to commit.
+Setting up watches.  Beware: since -r was given, this may take a while!
+Watches established.
+/home/ryan/projects/ MODIFY nohup.out
+Sun May  4 10:47:47 PM CDT 2025: Change detected in '/home/ryan/projects'. Staging changes...
