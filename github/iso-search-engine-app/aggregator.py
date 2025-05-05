@@ -58,4 +58,21 @@ def search_isos(query, version):
 
     # Windows
     if "windows" in query_lower:
+        # Try to infer architecture from query
+        architecture = None
+        if "64" in query_lower or "x64" in query_lower or "amd64" in query_lower:
+            architecture = "x86_64"
+        elif "32" in query_lower or "x86" in query_lower or "i386" in query_lower:
+            architecture = "i386"
+            
+        # Pass query, version, and architecture to the Windows scraper
+        scrapers_to_run.append((official_windows.scrape_windows, (search_query, version, architecture)))
+        
+        # For older Windows versions (Vista, 7, 8), try both architectures if not specified
+        if version in ["vista", "7", "8", "8.1"] and architecture is None:
+            scrapers_to_run.append((official_windows.scrape_windows, (search_query, version, "x86_64")))
+            scrapers_to_run.append((official_windows.scrape_windows, (search_query, version, "i386")))
+            
+        # Optionally add torrent sites for Windows if desired
+        # scrapers_to_run.append((linuxtracker.scrape_linuxtracker, (search_query, version)))
 
