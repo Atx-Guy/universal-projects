@@ -36,6 +36,11 @@ def find_links(soup, base_url, patterns, architecture=None):
 
         # Check if href matches any pattern
         if any(pattern.lower() in absolute_href.lower() for pattern in patterns):
+            # Skip non-ISO file types that we don't want to display
+            unwanted_extensions = [".zsync", ".list", ".manifest", ".metalink", ".sha256", ".md5", ".asc", ".sig", ".txt", ".log"]
+            if any(absolute_href.lower().endswith(ext) for ext in unwanted_extensions):
+                continue
+                
             # Basic check to filter out checksums (.sha256sum, .md5sum, etc.) and signatures (.asc, .sig)
             if not re.search(r"\.(sha\d*sum|md5sum|asc|sig|txt)$", absolute_href.lower()):
                 # Add architecture info to link metadata and filter if specified
