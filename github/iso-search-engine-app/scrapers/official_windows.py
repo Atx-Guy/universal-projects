@@ -46,7 +46,20 @@ def scrape_internet_archive(query, version, architecture):
     """Scrapes Internet Archive for Windows ISO downloads."""
     logging.info(f"Searching Internet Archive for: {query}, version: {version}, architecture: {architecture}")
     
-    search_query = f"{query} {version} iso"
+    # Create a more specific search query based on version
+    if version == "vista":
+        search_query = "Windows Vista ISO"
+    else:
+        search_query = f"Windows {version} ISO"
+        
+    # Add architecture to search query if specified
+    if architecture:
+        if architecture == "x86_64":
+            search_query += " 64-bit OR 64bit OR x64 OR amd64"
+        elif architecture == "i386":
+            search_query += " 32-bit OR 32bit OR x86"
+    
+    logging.info(f"Searching Internet Archive with query: {search_query}")
     search_url = f"https://archive.org/search?query={quote_plus(search_query)}"
     found_links = []
     
@@ -68,31 +81,50 @@ def scrape_internet_archive(query, version, architecture):
             if not identifier:
                 continue
                 
-            # Get item title to check if it matches Windows version
+            # Get item title
             title_elem = item.select_one(".ttl")
             if not title_elem:
                 continue
                 
-            title = title_elem.text.strip().lower()
+            title = title_elem.text.strip()
+            title_lower = title.lower()
             
-            # Check if this result seems relevant
-            if "windows" not in title:
+            # Check if this result seems relevant to Windows
+            if "windows" not in title_lower:
+                continue
+            
+            # Version matching based on the selected version
+            version_match = False
+            if version == "11" and ("windows 11" in title_lower or "windows11" in title_lower):
+                version_match = True
+            elif version == "10" and ("windows 10" in title_lower or "windows10" in title_lower):
+                version_match = True
+            elif version == "8.1" and ("windows 8.1" in title_lower or "windows8.1" in title_lower):
+                version_match = True
+            elif version == "8" and ("windows 8" in title_lower and "8.1" not in title_lower):
+                version_match = True
+            elif version == "7" and ("windows 7" in title_lower or "windows7" in title_lower):
+                version_match = True
+            elif version == "vista" and ("windows vista" in title_lower or "windowsvista" in title_lower):
+                version_match = True
+                
+            if not version_match:
                 continue
                 
-            if version and version not in title:
-                continue
-                
-            # Check architecture match
+            # Check architecture match if specified
             arch_match = True
             if architecture:
                 arch_lower = architecture.lower()
                 if arch_lower == "x86_64":
                     arch_keywords = ["64", "x64", "amd64", "x86_64"]
-                    if not any(k in title for k in arch_keywords):
+                    if not any(k in title_lower for k in arch_keywords):
                         arch_match = False
                 elif arch_lower == "i386":
                     arch_keywords = ["32", "x86", "i386"]
-                    if not any(k in title for k in arch_keywords):
+                    if not any(k in title_lower for k in arch_keywords) and all(k not in title_lower for k in ["64", "x64", "amd64"]):
+                        # If no explicit 32-bit mention, and also no 64-bit mention, assume it might be 32-bit
+                        pass
+                    elif not any(k in title_lower for k in arch_keywords):
                         arch_match = False
             
             if not arch_match:
@@ -105,21 +137,26 @@ def scrape_internet_archive(query, version, architecture):
             link_info = {
                 "link": details_url,
                 "source": "Internet Archive",
-                "title": title_elem.text.strip()
+                "title": title
             }
             
-            if architecture:
+            # Set architecture information
+            if "64" in title_lower or "x64" in title_lower or "amd64" in title_lower:
+                link_info["architecture"] = "x86_64"
+            elif "32" in title_lower or "x86" in title_lower or "i386" in title_lower:
+                link_info["architecture"] = "i386"
+            elif architecture:
                 link_info["architecture"] = architecture
             
             found_links.append(link_info)
+            logging.info(f"Found matching Windows ISO: {title}")
             
         except Exception as e:
             logging.error(f"Error processing Internet Archive result: {e}")
             continue
     
-    unique_links = {link["link"]: link for link in found_links}.values()
-    logging.info(f"Found {len(unique_links)} unique Internet Archive links for {query} {version}")
-    return list(unique_links)
+    logging.info(f"Found {len(found_links)} Windows ISOs on Internet Archive for version {version}")
+    return found_links
 
 def scrape_windows(query, version=None, architecture=None):
     """Scrapes official Microsoft download pages and Internet Archive for Windows ISO links."""
