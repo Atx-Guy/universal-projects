@@ -10,8 +10,19 @@
     <div class="container">
         <h1>ISO Search Engine</h1>
         <form id="search-form">
-            <input type="text" id="search-query" placeholder="Enter OS name (e.g., Ubuntu 24.04, Windows 11)" required>
-            <button type="submit">Search</button>
+            <div class="search-controls">
+                <input type="text" id="search-query" placeholder="Enter OS name (e.g., Ubuntu 24.04, Windows 11)" required>
+                <select id="architecture-filter" required>
+                    <option value="" disabled selected>Select Architecture</option>
+                    <option value="x86_64">x86_64 (64-bit)</option>
+                    <option value="i386">i386 (32-bit)</option>
+                    <option value="aarch64">ARM64 / AArch64</option>
+                    <option value="armhf">ARM (32-bit)</option>
+                    <option value="ppc64el">PowerPC 64-bit</option>
+                    <option value="s390x">s390x (IBM Z)</option>
+                </select>
+                <button type="submit">Search</button>
+            </div>
         </form>
         <div id="results-container">
             <h2>Results</h2>
