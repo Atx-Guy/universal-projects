@@ -20,16 +20,13 @@ def search():
     """API endpoint to handle search queries."""
     query = request.args.get("q")
     version = request.args.get("version", "")
-    architecture = request.args.get("arch")
     
     if not query:
         return jsonify({"error": "Missing query parameter 'q'."}), 400
-    if not architecture:
-        return jsonify({"error": "Missing architecture parameter 'arch'."}), 400
 
-    logging.info(f"Received search request for: {query}, version: {version}, architecture: {architecture}")
+    logging.info(f"Received search request for: {query}, version: {version}")
     try:
-        results = aggregator.search_isos(query, version, architecture)
+        results = aggregator.search_isos(query, version)
         logging.info(f"Returning {len(results)} results for query: {query}")
         return jsonify(results)
     except Exception as e:
