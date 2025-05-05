@@ -23,15 +23,28 @@ h1 {
 }
 
 #search-form {
-    display: flex;
     margin-bottom: 20px;
 }
 
+.search-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 #search-query {
-    flex-grow: 1;
+    flex: 1 1 300px;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 4px 0 0 4px;
+    border-radius: 4px;
+}
+
+#architecture-filter {
+    flex: 0 1 150px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
 }
 
 #search-form button {
@@ -40,7 +53,7 @@ h1 {
     background-color: #5cb85c;
     color: white;
     cursor: pointer;
-    border-radius: 0 4px 4px 0;
+    border-radius: 4px;
     transition: background-color 0.3s ease;
 }
 
