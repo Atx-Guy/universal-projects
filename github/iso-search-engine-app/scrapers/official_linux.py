@@ -20,8 +20,8 @@ def safe_request(url, timeout=15): # Increased timeout slightly
         logging.error(f"Request failed for {url}: {e}")
         return None
 
-def find_links(soup, base_url, patterns):
-    """Finds links matching given patterns (href contains)."""
+def find_links(soup, base_url, patterns, architecture=None):
+    """Finds links matching given patterns (href contains) and optionally filters by architecture."""
     links = []
     for a_tag in soup.find_all("a", href=True):
         href = a_tag["href"]
@@ -37,8 +37,30 @@ def find_links(soup, base_url, patterns):
         # Check if href matches any pattern
         if any(pattern.lower() in absolute_href.lower() for pattern in patterns):
             # Basic check to filter out checksums (.sha256sum, .md5sum, etc.) and signatures (.asc, .sig)
-            if not re.search(r"\.(sha\d*sum|md5sum|asc|sig|txt)$", absolute_href.lower()): # Corrected regex quotes
-                links.append({"link": absolute_href, "source": "Official"})
+            if not re.search(r"\.(sha\d*sum|md5sum|asc|sig|txt)$", absolute_href.lower()):
+                # Add architecture info to link metadata and filter if specified
+                link_info = {"link": absolute_href, "source": "Official"}
+                
+                # Try to detect architecture from link
+                href_lower = absolute_href.lower()
+                
+                if "amd64" in href_lower or "x86_64" in href_lower:
+                    link_info["architecture"] = "x86_64"
+                elif "i386" in href_lower or "i686" in href_lower or "x86" in href_lower:
+                    link_info["architecture"] = "i386"
+                elif "arm64" in href_lower or "aarch64" in href_lower:
+                    link_info["architecture"] = "aarch64"
+                elif "armhf" in href_lower or "armv7" in href_lower:
+                    link_info["architecture"] = "armhf"
+                elif "ppc64" in href_lower or "powerpc64" in href_lower:
+                    link_info["architecture"] = "ppc64el"
+                elif "s390x" in href_lower:
+                    link_info["architecture"] = "s390x"
+                
+                # Include the link if no architecture filter is specified
+                # or if the architecture matches
+                if not architecture or not link_info.get("architecture") or architecture.lower() in link_info.get("architecture", "").lower():
+                    links.append(link_info)
     return links
 
 # --- Scraper Functions ---
