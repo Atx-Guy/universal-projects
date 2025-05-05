@@ -269,17 +269,51 @@ def scrape_linux_mint(query):
 
 # --- Main function for this module ---
 
-def scrape(distro, query):
-    """Calls the appropriate scraper based on the distribution name."""
+def scrape(distro, query, architecture=None):
+    """Calls the appropriate scraper based on the distribution name and filters by architecture."""
     distro_lower = distro.lower()
+    
+    # Function wrapper to add architecture filtering
+    def scrape_with_architecture(scraper_func, query):
+        results = scraper_func(query)
+        if not architecture:
+            return results
+            
+        # Filter results by architecture
+        filtered_results = []
+        for link_info in results:
+            href_lower = link_info["link"].lower()
+            
+            # Detect architecture from link if not already detected
+            if "architecture" not in link_info:
+                if "amd64" in href_lower or "x86_64" in href_lower:
+                    link_info["architecture"] = "x86_64"
+                elif "i386" in href_lower or "i686" in href_lower or "x86" in href_lower:
+                    link_info["architecture"] = "i386"  
+                elif "arm64" in href_lower or "aarch64" in href_lower:
+                    link_info["architecture"] = "aarch64"
+                elif "armhf" in href_lower or "armv7" in href_lower:
+                    link_info["architecture"] = "armhf"
+                elif "ppc64" in href_lower or "powerpc64" in href_lower:
+                    link_info["architecture"] = "ppc64el"
+                elif "s390x" in href_lower:
+                    link_info["architecture"] = "s390x"
+                    
+            # Include if architecture matches or not specified in link
+            if not link_info.get("architecture") or architecture.lower() in link_info.get("architecture", "").lower():
+                filtered_results.append(link_info)
+                
+        logging.info(f"Filtered {len(results)} links to {len(filtered_results)} matching architecture {architecture}")
+        return filtered_results
+    
     if distro_lower == "ubuntu":
-        return scrape_ubuntu(query)
+        return scrape_with_architecture(scrape_ubuntu, query)
     elif distro_lower == "fedora":
-        return scrape_fedora(query)
+        return scrape_with_architecture(scrape_fedora, query)
     elif distro_lower == "debian":
-        return scrape_debian(query)
+        return scrape_with_architecture(scrape_debian, query)
     elif distro_lower == "linux mint" or distro_lower == "mint":
-        return scrape_linux_mint(query)
+        return scrape_with_architecture(scrape_linux_mint, query)
     else:
         logging.warning(f"Unsupported Linux distribution: {distro}")
         return []
