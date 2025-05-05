@@ -3,13 +3,32 @@
 document.addEventListener("DOMContentLoaded", () => {
     const searchForm = document.getElementById("search-form");
     const searchQueryInput = document.getElementById("search-query");
+    const versionFilter = document.getElementById("version-filter");
     const architectureFilter = document.getElementById("architecture-filter");
     const resultsList = document.getElementById("results-list");
     const loadingIndicator = document.getElementById("loading-indicator");
 
+    // Auto-select OS family in version dropdown based on search query input
+    searchQueryInput.addEventListener("input", () => {
+        const query = searchQueryInput.value.toLowerCase().trim();
+        const optgroups = versionFilter.querySelectorAll("optgroup");
+        
+        optgroups.forEach(optgroup => {
+            const osFamily = optgroup.label.toLowerCase();
+            if (query.includes(osFamily)) {
+                // If the query contains this OS family name, select the first version
+                const firstOption = optgroup.querySelector("option");
+                if (firstOption) {
+                    versionFilter.value = firstOption.value;
+                }
+            }
+        });
+    });
+
     searchForm.addEventListener("submit", async (event) => {
         event.preventDefault(); // Prevent default form submission
         const query = searchQueryInput.value.trim();
+        const version = versionFilter.value;
         const architecture = architectureFilter.value;
 
         if (!query) {
@@ -21,8 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
         loadingIndicator.style.display = "block";
 
         try {
-            // Make API call to the backend with both query and architecture filter
-            const response = await fetch(`/search?q=${encodeURIComponent(query)}&arch=${encodeURIComponent(architecture)}`);
+            // Make API call to the backend with query, version, and architecture filters
+            const response = await fetch(`/search?q=${encodeURIComponent(query)}&version=${encodeURIComponent(version)}&arch=${encodeURIComponent(architecture)}`);
             
             if (!response.ok) {
                 // Handle HTTP errors
