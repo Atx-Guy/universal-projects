@@ -1,0 +1,66 @@
+Metadata-Version: 2.1
+Name: Aggregator
+Version: 20.5
+Summary: Aggregation of data from high to coarse resolution.
+Home-page: https://github.com/mommebutenschoen/Aggregator
+Author: Momme Butenschön
+Author-email: mommebu@yahoo.de
+License: GPL
+Keywords: numpy,scipy,netCDF4,Aggregator
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Provides-Extra: dev
+Requires-Dist: check-manifest ; extra == 'dev'
+Provides-Extra: test
+
+
+=================
+Aggregator README
+=================
+
+This package contains a class for aggregation of high resolution data on coarse grids.
+
+
+Installation:
+-------------
+
+After downloading the source from github_ install via pip, descending
+into the top-level of the source tree
+and launching::
+
+  pip3 install .
+
+or to install in developers mode::
+
+  pip3 install -e .
+
+Or install the latest releaase from PyPI::
+
+  pip install Aggregator
+
+.. _github: https://github.com/mommebutenschoen/Aggregator
+
+
+Documentation:
+--------------
+
+Documentation to this package can be found on readthedocs_.
+
+
+.. _readthedocs: https://Aggregator.readthedocs.io/
+
+
