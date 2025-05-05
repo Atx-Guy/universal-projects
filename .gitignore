@@ -20,3 +20,5 @@ config.ini
 # Build output
 dist/
 build/
+
+nohup.out
