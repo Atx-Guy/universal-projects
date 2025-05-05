@@ -1,0 +1,22 @@
+# Log files
+*.log
+
+# Temporary files
+*~
+*.tmp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Dependency directories (if applicable)
+node_modules/
+vendor/
+
+# Secrets or config files you don't want public
+config.ini
+.env
+
+# Build output
+dist/
+build/
